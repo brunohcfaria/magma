@@ -81,9 +81,12 @@ class AMFAppProcedureTest : public ::testing::Test {
                  .mnc_digit2 = 5,
                  .mnc_digit1 = 4};
 
+  // Each msin digit is stored in a nibble
   itti_amf_decrypted_msin_info_ans_t decrypted_msin = {
-      .msin = {'9', '7', '6', '5', '4', '5', '6', '6', '0'},
-      .msin_length = 10,
+      //.msin = {'9', '7', '6', '5', '4', '5', '6', '6', '0'},
+      //   .msin = {0x97, 0x65, 0x45, 0x66, 0x00},
+      .msin = {0x79, 0x56, 0x54, 0x66, 0x00},
+      .msin_length = 5,
       .result = 1,
       .ue_id = 1};
 

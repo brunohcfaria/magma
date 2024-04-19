@@ -885,16 +885,17 @@ int amf_decrypt_msin_info_answer(itti_amf_decrypted_msin_info_ans_t* aia) {
   supi_imsi.plmn.mnc_digit3 =
       ue_context->amf_context.m5_guti.guamfi.plmn.mnc_digit3;
 
+  // Swap the nibbles back to the normal position
   supi_imsi.msin[0] =
-      (uint8_t)(((aia->msin[0] - '0') << 4) | (aia->msin[1] - '0'));
+      (uint8_t)(((aia->msin[0] & 0x0F) << 4 | (aia->msin[0] & 0xF0) >> 4));
   supi_imsi.msin[1] =
-      (uint8_t)(((aia->msin[2] - '0') << 4) | (aia->msin[3] - '0'));
+      (uint8_t)(((aia->msin[1] & 0x0F) << 4 | (aia->msin[1] & 0xF0) >> 4));
   supi_imsi.msin[2] =
-      (uint8_t)(((aia->msin[4] - '0') << 4) | (aia->msin[5] - '0'));
+      (uint8_t)(((aia->msin[2] & 0x0F) << 4 | (aia->msin[2] & 0xF0) >> 4));
   supi_imsi.msin[3] =
-      (uint8_t)(((aia->msin[6] - '0') << 4) | (aia->msin[7] - '0'));
+      (uint8_t)(((aia->msin[3] & 0x0F) << 4 | (aia->msin[3] & 0xF0) >> 4));
   supi_imsi.msin[4] =
-      (uint8_t)(((aia->msin[8] - '0') << 4) | (aia->msin[9] - '0'));
+      (uint8_t)(((aia->msin[4] & 0x0F) << 4 | (aia->msin[4] & 0xF0) >> 4));
 
   // Copy entire supi_imsi to param->imsi->u.value
   memcpy(&params->imsi->u.value, &supi_imsi, IMSI_BCD8_SIZE);
