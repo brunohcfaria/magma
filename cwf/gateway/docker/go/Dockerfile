@@ -8,9 +8,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+ARG CPU_ARCH=x86_64
+ARG DEB_PORT=amd64
+ARG OS_DIST=ubuntu
+ARG OS_RELEASE=focal
 
-ARG baseImage="ubuntu:focal"
-FROM ${baseImage} as base
+FROM $OS_DIST:$OS_RELEASE as base
+ARG CPU_ARCH
+ARG DEB_PORT
+ARG OS_DIST
+ARG OS_RELEASE
 
 # Add the magma apt repo
 RUN apt-get update && \
@@ -35,7 +42,7 @@ RUN apt-get update && apt-get install -y \
     libjemalloc-dev \
     libssl-dev \
     libsystemd-dev \
-    magma-nghttpx=1.31.1-1 \
+    nghttp2 \
     make \
     net-tools \
     pkg-config \
@@ -46,25 +53,18 @@ RUN apt-get update && apt-get install -y \
     sudo \
     unzip \
     vim \
-    virtualenv
+    virtualenv \
+    protobuf-compiler \
+    libprotoc-dev
 
 # Golang
 WORKDIR /usr/local
-ARG GOLANG_VERSION="1.20.1"
-RUN GO_TARBALL="go${GOLANG_VERSION}.linux-amd64.tar.gz" \
- && curl https://linuxfoundation.jfrog.io/artifactory/magma-blob/${GO_TARBALL} --remote-name --location \
+ARG GOLANG_VERSION="1.21.1"
+RUN GO_TARBALL="go${GOLANG_VERSION}.linux-${DEB_PORT}.tar.gz" \
+ && curl https://go.dev/dl/${GO_TARBALL} --remote-name --location \
  && tar -xzf ${GO_TARBALL} \
  && ln -s /usr/local/go/bin/go /usr/local/bin/go \
  && rm ${GO_TARBALL}
-
-# Install protobuf compiler.
-RUN curl -Lfs https://github.com/protocolbuffers/protobuf/releases/download/v3.1.0/protoc-3.1.0-linux-x86_64.zip -o protoc3.zip && \
-    unzip protoc3.zip -d protoc3 && \
-    mv protoc3/bin/protoc /bin/protoc && \
-    chmod a+rx /bin/protoc && \
-    mv protoc3/include/google /usr/include/ && \
-    chmod -R a+Xr /usr/include/google && \
-    rm -rf protoc3.zip protoc3
 
 ENV GOBIN /var/opt/magma/bin
 ENV MAGMA_ROOT /magma
@@ -122,7 +122,11 @@ RUN make -C $MAGMA_ROOT/cwf/gateway build
 # -----------------------------------------------------------------------------
 # Production image
 # -----------------------------------------------------------------------------
-FROM ${baseImage} AS cwag_go
+FROM $OS_DIST:$OS_RELEASE AS cwag_go
+ARG CPU_ARCH
+ARG DEB_PORT
+ARG OS_DIST
+ARG OS_RELEASE
 
 # Install envdir.
 RUN apt-get -y update && apt-get -y install daemontools curl arping
