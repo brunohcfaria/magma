@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 # Base: for tests, precommit, codegen, etc.
 # ------------------------------------------------------------------------------
-ARG PLATFORM=linux/amd64
+ARG PLATFORM=linux/arm64
 
 FROM --platform=$PLATFORM ubuntu:focal as base
 
@@ -40,12 +40,13 @@ RUN apt-get update && apt-get install -y \
 # Golang
 WORKDIR /usr/local
 ARG GOLANG_VERSION="1.20.1"
-RUN GO_TARBALL="go${GOLANG_VERSION}.linux-amd64.tar.gz" \
- && curl https://linuxfoundation.jfrog.io/artifactory/magma-blob/${GO_TARBALL} --remote-name --location \
- && tar -xzf ${GO_TARBALL} \
- && ln -s /usr/local/go/bin/go /usr/local/bin/go \
- && ln -s /usr/local/go/bin/gofmt /usr/local/bin/gofmt \
- && rm ${GO_TARBALL}
+RUN GO_TARBALL="go${GOLANG_VERSION}.linux-arm64.tar.gz" \
+  # && curl https://linuxfoundation.jfrog.io/artifactory/magma-blob/${GO_TARBALL} --remote-name --location \
+  && curl https://go.dev/dl/${GO_TARBALL} --remote-name --location \
+  && tar -xzf ${GO_TARBALL} \
+  && ln -s /usr/local/go/bin/go /usr/local/bin/go \
+  && ln -s /usr/local/go/bin/gofmt /usr/local/bin/gofmt \
+  && rm ${GO_TARBALL}
 
 # Install goimports
 # RUN go get golang.org/x/tools/cmd/goimports
@@ -54,12 +55,12 @@ RUN GO_TARBALL="go${GOLANG_VERSION}.linux-amd64.tar.gz" \
 # Apt has 2.x but we need 3.x
 # See: https://grpc.io/docs/protoc-installation/
 RUN curl -Lfs https://github.com/protocolbuffers/protobuf/releases/download/v3.10.0/protoc-3.10.0-linux-x86_64.zip -o protoc3.zip && \
-    unzip protoc3.zip -d protoc3 && \
-    mv protoc3/bin/protoc /bin/protoc && \
-    chmod a+rx /bin/protoc && \
-    mv protoc3/include/google /usr/include/ && \
-    chmod -R a+Xr /usr/include/google && \
-    rm -rf protoc3.zip protoc3
+  unzip protoc3.zip -d protoc3 && \
+  mv protoc3/bin/protoc /bin/protoc && \
+  chmod a+rx /bin/protoc && \
+  mv protoc3/include/google /usr/include/ && \
+  chmod -R a+Xr /usr/include/google && \
+  rm -rf protoc3.zip protoc3
 
 # ------------------------------------------------------------------------------
 # Gocache: cache Go modules
@@ -99,7 +100,7 @@ RUN . /etc/profile.d/env.sh && make build
 # ------------------------------------------------------------------------------
 # Production
 # ------------------------------------------------------------------------------
-FROM ubuntu:focal
+FROM --platform=$PLATFORM ubuntu:focal
 
 # Apt runtime deps
 RUN apt-get update && apt-get install -y \
@@ -109,7 +110,7 @@ RUN apt-get update && apt-get install -y \
   supervisor \
   unzip \
   wget \
-&& rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
 # Swagger UI
 # See: https://github.com/swagger-api/swagger-ui

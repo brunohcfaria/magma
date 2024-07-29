@@ -9,7 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM fluent/fluentd:v1.14.6-debian-1.0
+FROM fluent/fluentd:v1.17-debian-armhf-1
 
 USER root
 WORKDIR /home/fluent
@@ -24,15 +24,15 @@ RUN buildDeps="sudo make gcc g++ libc-dev libffi-dev" \
   && apt-get update \
   && apt-get upgrade -y \
   && apt-get install \
-    -y --no-install-recommends \
-    $buildDeps net-tools \
+  -y --no-install-recommends \
+  $buildDeps net-tools \
   && gem install bundler --version 1.16.2 \
   && bundle config silence_root_warning true \
   && bundle install --gemfile=/fluentd/Gemfile --path=/fluentd/vendor/bundle \
   && SUDO_FORCE_REMOVE=yes \
-    apt-get purge -y --auto-remove \
-                -o APT::AutoRemove::RecommendsImportant=false \
-                $buildDeps \
+  apt-get purge -y --auto-remove \
+  -o APT::AutoRemove::RecommendsImportant=false \
+  $buildDeps \
   && rm -rf /var/lib/apt/lists/* \
   && gem sources --clear-all \
   && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem

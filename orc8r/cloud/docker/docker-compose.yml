@@ -10,11 +10,11 @@ services:
       # log level can be modified at supervisord.conf without the need of building a new image
       - $PWD/controller/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
     environment:
-      TEST_MODE: "1"  # Run dev scripts on startup
-      SERVICE_HOSTNAME: localhost  # All services are reachable through localhost
+      TEST_MODE: "1" # Run dev scripts on startup
+      SERVICE_HOSTNAME: localhost # All services are reachable through localhost
       SQL_DRIVER: postgres
       DATABASE_SOURCE: "dbname=magma_dev user=magma_dev password=magma_dev host=postgres sslmode=disable"
-#      DATABASE_SOURCE: "magma_dev:magma_dev@(maria)/magma_dev"
+      #      DATABASE_SOURCE: "magma_dev:magma_dev@(maria)/magma_dev"
       SQL_DIALECT: psql
       SERVICE_REGISTRY_MODE: yaml
       ORC8R_DOMAIN_NAME: magma.test
@@ -26,7 +26,12 @@ services:
     depends_on:
       - postgres
       - fluentd
-    command: ["/bin/sh", "-c", "/usr/local/bin/wait-for-it.sh -s -t 30 postgres:5432 && /usr/bin/supervisord"]
+    command:
+      [
+        "/bin/sh",
+        "-c",
+        "/usr/local/bin/wait-for-it.sh -s -t 30 postgres:5432 && /usr/bin/supervisord"
+      ]
     restart: always
     platform: linux/x86_64
   # If you want to use log aggregation on a Mac or Windows host, uncomment
@@ -39,13 +44,13 @@ services:
   # restart the container before it sends logs to fluentd.
   # See https://github.com/moby/moby/issues/1143 for some ideas about
   # connecting the logging driver to your host localhost.
-#    logging:
-#      driver: fluentd
-#      options:
-#        fluentd-address: "host.docker.internal:24225"
-#        tag: orc8r.controller
-#        fluentd-retry-wait: "1s"
-#        fluentd-max-retries: "120"
+  #    logging:
+  #      driver: fluentd
+  #      options:
+  #        fluentd-address: "host.docker.internal:24225"
+  #        tag: orc8r.controller
+  #        fluentd-retry-wait: "1s"
+  #        fluentd-max-retries: "120"
 
   # Non-core essential services
 
@@ -66,8 +71,8 @@ services:
       - "postgres"
       - "-c"
       - "log_duration=true"
-#      - "-c"
-#      - "log_statement=all"
+    #      - "-c"
+    #      - "log_statement=all"
     restart: always
 
   maria:
@@ -85,9 +90,9 @@ services:
 
   nginx:
     ports:
-      - "7443:8443/tcp"   # controller gRPC port
-      - "7444:8444/tcp"   # bootstrapper port
-      - "9443:9443/tcp"   # API port
+      - "7443:8443/tcp" # controller gRPC port
+      - "7444:8444/tcp" # bootstrapper port
+      - "9443:9443/tcp" # API port
     volumes:
       - $PWD/../../../.cache/test_certs:/var/opt/magma/certs
     environment:
@@ -102,16 +107,16 @@ services:
     depends_on:
       - controller
     restart: always
-#    logging:
-#      driver: fluentd
-#      options:
-#        fluentd-address: "host.docker.internal:24225"
-#        tag: orc8r.nginx
-#        fluentd-retry-wait: "1s"
-#        fluentd-max-retries: "120"
+  #    logging:
+  #      driver: fluentd
+  #      options:
+  #        fluentd-address: "host.docker.internal:24225"
+  #        tag: orc8r.nginx
+  #        fluentd-retry-wait: "1s"
+  #        fluentd-max-retries: "120"
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.0-arm64
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -123,7 +128,7 @@ services:
     restart: always
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.3.1
+    image: docker.elastic.co/kibana/kibana:7.13.0-arm64
     ports:
       - "5601:5601"
     links:
