@@ -59,12 +59,12 @@ RUN apt-get update && apt-get install -y \
 
 # Golang
 WORKDIR /usr/local
-ARG GOLANG_VERSION="1.21.1"
+ARG GOLANG_VERSION="1.20.1"
 RUN GO_TARBALL="go${GOLANG_VERSION}.linux-${DEB_PORT}.tar.gz" \
- && curl https://go.dev/dl/${GO_TARBALL} --remote-name --location \
- && tar -xzf ${GO_TARBALL} \
- && ln -s /usr/local/go/bin/go /usr/local/bin/go \
- && rm ${GO_TARBALL}
+    && curl https://go.dev/dl/${GO_TARBALL} --remote-name --location \
+    && tar -xzf ${GO_TARBALL} \
+    && ln -s /usr/local/go/bin/go /usr/local/bin/go \
+    && rm ${GO_TARBALL}
 
 ENV GOBIN /var/opt/magma/bin
 ENV MAGMA_ROOT /magma

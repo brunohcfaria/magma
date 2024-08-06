@@ -42,14 +42,14 @@ ENV XDG_CACHE_HOME ${MAGMA_ROOT}/.cache
 
 RUN apt-get update && \
   # Setup necessary tools for adding the Magma repository
-  apt-get install -y apt-utils software-properties-common apt-transport-https gnupg wget && \
+  apt-get install -y --no-install-recommends apt-utils software-properties-common apt-transport-https gnupg wget && \
   # Download Bazel
   wget -P /usr/sbin --progress=dot:giga https://github.com/bazelbuild/bazelisk/releases/download/v1.10.0/bazelisk-linux-"${DEB_PORT}" && \
   chmod +x /usr/sbin/bazelisk-linux-"${DEB_PORT}" && \
   ln -s /usr/sbin/bazelisk-linux-"${DEB_PORT}" /usr/sbin/bazel
 
 # Install dependencies required for building
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
   autoconf \
   autogen \
   build-essential \
@@ -96,7 +96,7 @@ RUN apt-get update && apt-get install -y \
 # Add the magma apt repo
 COPY keys/linux_foundation_registry_key.asc /etc/apt/trusted.gpg.d/magma.asc
 RUN echo "deb https://linuxfoundation.jfrog.io/artifactory/magma-packages-test focal-ci main" > /etc/apt/sources.list.d/magma.list
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
   grpc-dev \
   libfolly-dev \
   liblfds710 \
