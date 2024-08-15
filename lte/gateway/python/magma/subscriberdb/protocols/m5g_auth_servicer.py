@@ -182,8 +182,10 @@ class M5GSUCIRegRpcServicer(subscriberdb_pb2_grpc.M5GSUCIRegistrationServicer):
                 return aia
 
             home_network_info = ECIES_HN(
-                suciprofile.home_network_private_key,
+                None,
                 profile,
+                raw_keypair=(suciprofile.home_network_private_key,
+                             suciprofile.home_network_public_key)
             )
 
             msin_recv = home_network_info.unprotect(
